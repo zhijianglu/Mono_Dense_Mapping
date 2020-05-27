@@ -1,0 +1,3 @@
+<launch>
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find open_quadtree_mapping)/launch/mapping_rviz_config.rviz" />
+</launch>

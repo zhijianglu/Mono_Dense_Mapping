@@ -1,0 +1,48 @@
+<launch>
+    <arg name="config_path" default = "$(find feature_tracker)/../config/euroc/euroc_MH5_mapping.yaml" />
+	  <arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
+    
+    <node name="feature_tracker" pkg="feature_tracker" type="feature_tracker" output="log">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="vins_estimator" pkg="vins_estimator" type="vins_estimator" output="screen">
+       <param name="config_file" type="string" value="$(arg config_path)" />
+       <param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="pose_graph" pkg="pose_graph" type="pose_graph" output="screen">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="visualization_shift_x" type="int" value="0" />
+        <param name="visualization_shift_y" type="int" value="0" />
+        <param name="skip_cnt" type="int" value="0" />
+        <param name="skip_dis" type="double" value="0" />
+    </node>
+
+  <node pkg="open_quadtree_mapping" type="open_quadtree_mapping_node" name="open_quadtree_mapping" clear_params="true" output="screen">
+    <param name="cam_width" value="752" />
+    <param name="cam_height" value="480" />
+    <param name="cam_fx" value="3.6537093297021136e+02" />
+    <param name="cam_cx" value="3.6964744957606678e+02" />
+    <param name="cam_fy" value="3.6507591213493185e+02" />
+    <param name="cam_cy" value="2.4095181606217392e+02" />
+    <param name="cam_k1" value="-2.6308981682861932e-01"/>
+    <param name="cam_k2" value="5.6218950573062511e-02"/>
+    <param name="cam_r1" value="-1.4306684839826532e-03"/>
+    <param name="cam_r2" value="-2.4563568486974763e-04"/>
+    <!--downsample factor: 0 ~ 1-->
+    <param name="downsample_factor" value="1"/>
+    <param name="semi2dense_ratio" value="1"/>
+
+    <!-- if using synchronize image and pose-->
+    <remap from="~image" to="/mv_25001498/image_raw" />
+    <remap from="~posestamped" to="/vins_estimator/camera_pose" />
+  </node>  
+
+  	<node pkg="rosbag" type="play" name="playe" output="log" args="/media/lab/S_disk/data/euroc/MH05/MH_05_difficult.bag"/>
+
+
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find vins_estimator)/../config/vins_rviz_config.rviz" />
+
+</launch>

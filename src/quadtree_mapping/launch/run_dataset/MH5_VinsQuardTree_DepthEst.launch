@@ -1,0 +1,29 @@
+<launch>
+
+<arg name="config_path" default = "$(find feature_tracker)/../config/euroc/euroc_MH5_config.yaml" />
+
+  <node pkg="open_quadtree_mapping" type="open_quadtree_mapping_node" name="open_quadtree_mapping" clear_params="true" output="screen">
+
+    <param name="config_file" type="string" value="$(arg config_path)" />
+
+    <param name="cam_width" value="752" />
+    <param name="cam_height" value="480" />
+
+    <param name="cam_fx" value="4.616e+02" />
+    <param name="cam_fy" value="4.603e+02" />
+    <param name="cam_cx" value="3.630e+02" />
+    <param name="cam_cy" value="2.481e+02" />
+
+    <param name="cam_k1" value="-2.917e-01"/>
+    <param name="cam_k2" value="8.228e-02"/>
+    <param name="cam_r1" value="5.333e-05"/>
+    <param name="cam_r2" value="-1.578e-04"/>
+    <param name="downsample_factor" value="1"/>
+    <param name="semi2dense_ratio" value="2"/>
+
+    <!--将vins输出的pose的topic映射成自己的topic image和posestamped， 方便测试不同数据集-->
+    <remap from="~image" to="/cam0/image_raw" />
+    <remap from="~posestamped" to="/vins_estimator/mapping_pose" />
+  </node>
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find open_quadtree_mapping)/launch/MH5_Globalmapping_config.rviz" />
+</launch>
